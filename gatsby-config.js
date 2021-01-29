@@ -6,5 +6,10 @@
 
 module.exports = {
   /* Your site config here */
-  plugins: [],
+  plugins: [
+    'gatsby-plugin-offline',
+    'gatsby-plugin-react-helmet',
+    'gatsby-plugin-typescript',
+    'gatsby-plugin-netlify-cms',
+  ],
 }
