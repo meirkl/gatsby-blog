@@ -1,50 +1,55 @@
 import React from 'react'
-import { Link, graphql, StaticQuery } from 'gatsby'
+import { Link, graphql, useStaticQuery } from 'gatsby'
+import { MarkDownRemark } from '../entities/markdown-remark'
 
-type Props = {
-  data: {
-    allMarkdownRemark: {
-      edges: any[]
-    }
+type GraphQLResult = {
+  allMarkdownRemark: {
+    totalCount: number
+    edges: Array<{ node: MarkDownRemark }>
   }
-  count: any
 }
 
-const BlogRoll: React.FC<Props> = props => {
-  const { data } = props
-  const { edges: posts } = data.allMarkdownRemark
+const BlogRoll: React.FC = () => {
+  const { allMarkdownRemark }: GraphQLResult = useStaticQuery(graphql`
+    query BlogRollQuery {
+      allMarkdownRemark(sort: { order: DESC, fields: [frontmatter___date] }) {
+        totalCount
+        edges {
+          node {
+            excerpt(pruneLength: 300)
+            id
+            frontmatter {
+              path
+              title
+              date(formatString: "MMMM DD, YYYY")
+            }
+          }
+        }
+      }
+    }
+  `)
+  const { edges: posts } = allMarkdownRemark
 
   return (
-    <div className="columns is-multiline">
+    <div>
       {posts &&
         posts.map(({ node: post }) => (
-          <div className="is-parent column is-6" key={post.id}>
-            <article
-              className={`blog-list-item tile is-child box notification ${
-                post.frontmatter.featuredpost ? 'is-featured' : ''
-              }`}
-            >
+          <div key={post.id}>
+            <article>
               <header>
-                <p className="post-meta">
-                  <Link
-                    className="title has-text-primary is-size-4"
-                    to={post.frontmatter.path}
-                  >
+                <p>
+                  <Link to={post.frontmatter.path}>
                     {post.frontmatter.title}
                   </Link>
                   <span> &bull; </span>
-                  <span className="subtitle is-size-5 is-block">
-                    {post.frontmatter.date}
-                  </span>
+                  <span>{post.frontmatter.date}</span>
                 </p>
               </header>
               <p>
                 {post.excerpt}
                 <br />
                 <br />
-                <Link className="button" to={post.frontmatter.path}>
-                  Keep Reading →
-                </Link>
+                <Link to={post.frontmatter.path}>Keep Reading →</Link>
               </p>
             </article>
           </div>
@@ -53,26 +58,4 @@ const BlogRoll: React.FC<Props> = props => {
   )
 }
 
-export default () => (
-  <StaticQuery
-    query={graphql`
-      query BlogRollQuery {
-        allMarkdownRemark(sort: { order: DESC, fields: [frontmatter___date] }) {
-          edges {
-            node {
-              excerpt(pruneLength: 400)
-              id
-              frontmatter {
-                path
-                title
-                date(formatString: "MMMM DD, YYYY")
-              }
-            }
-          }
-        }
-      }
-    `}
-    // @ts-ignore
-    render={(data: any, count: any) => <BlogRoll data={data} count={count} />}
-  />
-)
+export default BlogRoll

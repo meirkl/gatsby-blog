@@ -1,13 +1,12 @@
 import React from 'react'
-
 import BlogRoll from '../components/BlogRoll'
 
-const BlogIndexPage = () => {
+const BlogIndexPage: React.FC = () => {
   return (
     <>
       <h1>Latest Posts</h1>
       <section>
-        <div className="content">
+        <div>
           <BlogRoll />
         </div>
       </section>
